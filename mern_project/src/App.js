@@ -12,9 +12,9 @@ function App() {
     <MainNav />
     <main>
       <Routes>
-        <Route path="/" exact element={<Users/>} />
-        <Route path="/places/new" exact element={<NewPlace/>} />
-        <Route path='/:userId/places' exact element={<UserPlaces/>}/>
+        <Route path="/" element={<Users/>} />
+        <Route path="/places/new" element={<NewPlace/>} />
+        <Route path='/:userId/places' element={<UserPlaces/>}/>
       </Routes>
     </main>
     </BrowserRouter>
