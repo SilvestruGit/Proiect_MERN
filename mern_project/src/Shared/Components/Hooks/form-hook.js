@@ -25,9 +25,6 @@ const formReducer = (state, action) => {
                 isValid: formIsValid
             };
 
-        case 'DESCRIPTION_CHANGE':
-            return {};
-
         case 'SET_DATA':
             return {
                 inputs: action.inputs,

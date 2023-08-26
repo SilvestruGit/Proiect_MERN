@@ -18,6 +18,10 @@ const PlaceItem = props => {
         setShowMap(false);
     }
 
+    const deleteHandler = id => {
+        
+    }
+
     return (
         <React.Fragment>
             <Modal
@@ -45,7 +49,7 @@ const PlaceItem = props => {
                     <div className='place-item__actions'>
                         <Button inverse onClick={openMap}>View On Map</Button>
                         <Button to={`/places/${props.id}`}>Edit</Button>
-                        <Button danger>Delete</Button>
+                        <Button danger onClick={deleteHandler}>Delete</Button>
                     </div>
                 </Card>
             </li>
