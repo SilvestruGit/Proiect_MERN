@@ -52,15 +52,7 @@ const Input = props => {
         });
     }
 
-    const element = props.element === 'input' ?
-        <input
-            id={props.id}
-            placeholder={props.placeholder}
-            type={props.type}
-            onChange={eventHandler}
-            onBlur={touchHandler}
-            value={inputState.value}
-        /> :
+    const element = props.element === 'textarea' ?
         <textarea
             id={props.id}
             rows={props.rows || 3}
@@ -68,7 +60,16 @@ const Input = props => {
             onChange={eventHandler}
             onBlur={touchHandler}
             value={inputState.value}
+        /> :
+        <input
+            id={props.id}
+            placeholder={props.placeholder}
+            type={props.type}
+            onChange={eventHandler}
+            onBlur={touchHandler}
+            value={inputState.value}
         />
+
 
     return (
         <div className={`form-control ${!inputState.isValid && inputState.isTouched && 'form-control--invalid'}`}>

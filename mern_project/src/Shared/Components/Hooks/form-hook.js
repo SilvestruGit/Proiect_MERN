@@ -3,6 +3,9 @@ import { useCallback, useReducer } from 'react';
 const checkValidity = (state, action) => {
     let formIsValid = true;
     for (const input in state.inputs) {
+        if (!state.inputs[input]){
+            continue;
+        }
         if (input === action.inputId) {
             formIsValid = formIsValid && action.isValid;
         } else {
