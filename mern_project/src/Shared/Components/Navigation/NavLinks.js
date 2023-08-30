@@ -21,7 +21,7 @@ const NavLinks = props => {
                 <NavLink to={'/auth'}>AUTHENTICATE</NavLink>
             </li>}
             {auth.isLogedin && <li>
-                <button to={'/auth'} onClick={auth.logout}>LOGOUT</button>
+                <NavLink to={'/auth'} onClick={auth.logout}>LOGOUT</NavLink>
             </li>}
         </ul>
     );

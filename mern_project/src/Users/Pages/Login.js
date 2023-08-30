@@ -1,4 +1,5 @@
 import React, { useState, useContext } from "react";
+import {Link} from 'react-router-dom';
 import Input from "../../Shared/Components/FormElements/Input";
 import Button from "../../Shared/Components/FormElements/Button";
 import {
@@ -93,9 +94,11 @@ const Login = () => {
           onInput={inputHandler}
           errorText="The password is not correct!"
         />
-        <Button type="submit" disabled={!formState.isValid}>
-          {isLoginMode ? "LOGIN" : "SIGNUP"}
-        </Button>
+        <Link to='/'>
+            <Button type="submit" onClick={auth.login} disabled={!formState.isValid}>
+            {isLoginMode ? "LOGIN" : "SIGNUP"}
+            </Button>
+        </Link>
       </form>
       <Button inverse onClick={isLoginModeHandler}>
         {isLoginMode ? "SIGNUP" : "LOGIN"}
