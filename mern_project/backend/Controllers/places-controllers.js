@@ -1,6 +1,7 @@
 const Http_Error = require("../Models/http-error");
 const uuid = require('uuid').v4;
 const { validationResult } = require('express-validator');
+const getCoords = require('../util/location');
 
 const DUMMY_PLACES = [
     {
@@ -53,18 +54,23 @@ const getPlacesbyUserId = (req, res, next) => {
     res.json(userPlaces);
 };
 
-const createPlace = (req, res, next) => {
+const createPlace = async (req, res, next) => {
 
     const validationError = validationResult(req);
     if (!validationError.isEmpty()) {
         // console.log(validationError);
-        throw new Http_Error('Validation error!', 422);
+        next(new Http_Error('Validation error!', 422));
     }
 
     const { title, description, address, creatorId } = req.body;
-    // NOT WORKING
-    const coords = fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=AIzaSyDlvIrc1w-hyaXel3VzYdisAZ50py9v3V0`);
-    console.log(coords);
+
+    let coords;
+    try {
+        coords = await getCoords(address);
+    } catch (error) {
+        return next(error);
+    }
+
     const newPlace = {
         id: uuid(),
         title,
