@@ -2,6 +2,9 @@ const Http_Error = require("../Models/http-error");
 const uuid = require('uuid').v4;
 const { validationResult } = require('express-validator');
 const getCoords = require('../util/location');
+const Place = require('../Models/place');
+const {MongoClient} = require('mongodb');
+const uri = require('../uri');
 
 const DUMMY_PLACES = [
     {
@@ -14,7 +17,7 @@ const DUMMY_PLACES = [
             lat: 40.7484405,
             lng: -73.9878584
         },
-        creatorId: 1
+        creatorId: "u1"
     },
     {
         id: 'p2',
@@ -26,13 +29,20 @@ const DUMMY_PLACES = [
             lat: 40.7484405,
             lng: -73.9878584
         },
-        creatorId: 2
+        creatorId: "u2"
     }
 ];
 
-const getplacesById = (req, res, next) => {
+const getplacesById = async (req, res, next) => {
     const id = req.params.id;
-    const place = DUMMY_PLACES.find(place => place.id === id);
+    //const place = DUMMY_PLACES.find(place => place.id === id);
+    let place;
+    try {
+        place = await Place.findById(id).exec();
+    } catch (error) {
+        console.log(error);
+    }
+
 
     if (!place) {
         const error = new Http_Error('Could not find place with this id!', 404);
@@ -42,9 +52,22 @@ const getplacesById = (req, res, next) => {
     res.json({ place });
 };
 
-const getPlacesbyUserId = (req, res, next) => {
+const getPlacesbyUserId = async (req, res, next) => {
     const id = req.params.id;
-    const userPlaces = DUMMY_PLACES.filter(place => place.creatorId === Number(id));
+    //const userPlaces = DUMMY_PLACES.filter(place => place.creatorId === Number(id));
+
+    const client = new MongoClient(uri);
+    let userPlaces;
+    try {
+        await client.connect();
+        const db = client.db('places');
+        userPlaces = await db.collection('places').find().toArray();
+        userPlaces = userPlaces.filter(place => place.creatorId === id);
+    } catch (error) {
+        return next(error);
+    } finally {
+        client.close();
+    }
 
     if (!userPlaces[0]) {
         const error = new Http_Error('Could not find place with this user id!', 404);
@@ -67,48 +90,64 @@ const createPlace = async (req, res, next) => {
     let coords;
     try {
         coords = await getCoords(address);
+        // console.log(coords);
     } catch (error) {
         return next(error);
     }
 
-    const newPlace = {
-        id: uuid(),
+    const newPlace = new Place({
         title,
         description,
-        coordinates: coords,
         address,
+        coordinates: coords,
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/NYC_Empire_State_Building.jpg/640px-NYC_Empire_State_Building.jpg',
         creatorId
-    };
-    DUMMY_PLACES.push(newPlace);
+    });
+
+    try {
+        await newPlace.save();
+    } catch (error) {
+        const err = new Http_Error(
+            'Creating a place failed!',
+            500
+        );
+        return next(err);
+    }
+
 
     res.status(201).json({ place: newPlace });
 };
 
-const updatePlace = (req, res, next) => {
+const updatePlace = async (req, res, next) => {
     const validationError = validationResult(req);
     if (!validationError.isEmpty()) {
         // console.log(validationError);
         throw new Http_Error('Validation error!', 422);
     }
     const { title, description } = req.body;
-    const id = req.params.id;
+    const id = { _id: req.params.id };
+    let updatedPlace;
 
-    const updatedPlace = { ...DUMMY_PLACES.find(place => place.id === id) };
-    const index = DUMMY_PLACES.findIndex(place => place.id === id);
-
-    updatedPlace.title = title;
-    updatedPlace.description = description;
-
-    DUMMY_PLACES[index] = updatedPlace;
+    try {
+        const update = { title, description };
+        updatedPlace = await Place.findOneAndUpdate(id, update);
+    } catch (error) {
+        return next(error);
+    }
 
     res.status(200).json({ place: updatedPlace });
 };
 
-const deletePlace = (req, res, next) => {
+const deletePlace = async (req, res, next) => {
     const id = req.params.id;
-    const indexDelete = DUMMY_PLACES.findIndex(place => place.id === id);
+    //const indexDelete = DUMMY_PLACES.findIndex(place => place.id === id);
+    //DUMMY_PLACES.pop(indexDelete);
 
-    DUMMY_PLACES.pop(indexDelete);
+    try {
+        await Place.deleteOne({ _id: id});
+    } catch (error) {
+        return next(error);
+    }
 
     res.status(200).json({ message: 'Place deleted!' });
 }

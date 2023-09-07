@@ -1,9 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 const placesRouter = require('./routes/places-routes');
 const userRouter = require('./routes/user-routes');
 const Http_Error = require('./Models/http-error');
+const uri = require('./uri');
 
 const server = express();
 
@@ -26,4 +28,11 @@ server.use((error, req, res, next) => {
     res.json({ message: error.message || 'An error has occured!' });
 })
 
-server.listen(5000, () => console.log('Server is listening on port 5000'));
+mongoose
+    .connect(uri)
+    .then(() => {
+        server.listen(5000, ()=>console.log('server on port 5000'));
+    })
+    .catch(err => {
+        console.log(err);
+    })
