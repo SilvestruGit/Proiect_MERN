@@ -3,7 +3,7 @@ const uuid = require('uuid').v4;
 const { validationResult } = require('express-validator');
 const getCoords = require('../util/location');
 const Place = require('../Models/place');
-const {MongoClient} = require('mongodb');
+const { MongoClient } = require('mongodb');
 const uri = require('../uri');
 
 const DUMMY_PLACES = [
@@ -122,7 +122,7 @@ const updatePlace = async (req, res, next) => {
     const validationError = validationResult(req);
     if (!validationError.isEmpty()) {
         // console.log(validationError);
-        throw new Http_Error('Validation error!', 422);
+        return next(new Http_Error('Validation error!', 422));
     }
     const { title, description } = req.body;
     const id = { _id: req.params.id };
@@ -144,7 +144,7 @@ const deletePlace = async (req, res, next) => {
     //DUMMY_PLACES.pop(indexDelete);
 
     try {
-        await Place.deleteOne({ _id: id});
+        await Place.deleteOne({ _id: id });
     } catch (error) {
         return next(error);
     }
