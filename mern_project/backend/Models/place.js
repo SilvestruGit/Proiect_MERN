@@ -30,8 +30,9 @@ const placeSchema = new Schema({
         }
     },
     creatorId: {
-        type: String,
-        required: true
+        type: mongoose.Types.ObjectId,
+        required: true,
+        ref: 'User'
     }
 });
 
