@@ -1,5 +1,5 @@
 import React, {useState, useCallback} from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import Users from './Users/Pages/Users';
 import NewPlace from './Places/Pages/NewPlace';
 import MainNav from './Shared/Components/Navigation/MainNav';
@@ -36,6 +36,7 @@ function App() {
 
   const login = useCallback(() => {
     setIsLogedin(true);
+    <Navigate replace to="/error-page" />
   }, [])
   const logout = useCallback(() => {
     setIsLogedin(false );

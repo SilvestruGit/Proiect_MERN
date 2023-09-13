@@ -7,33 +7,6 @@ const { MongoClient } = require('mongodb');
 const uri = require('../uri');
 const User = require('../Models/user');
 
-const DUMMY_PLACES = [
-    {
-        id: 'p1',
-        title: 'Empire State Building',
-        description: 'One of the most famous sky scrapers in the world!',
-        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/NYC_Empire_State_Building.jpg/640px-NYC_Empire_State_Building.jpg',
-        address: '20 W 34th St, New York, NY 10001',
-        coordinates: {
-            lat: 40.7484405,
-            lng: -73.9878584
-        },
-        creatorId: "u1"
-    },
-    {
-        id: 'p2',
-        title: 'Empire State Building',
-        description: 'One of the most famous sky scrapers in the world!',
-        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/NYC_Empire_State_Building.jpg/640px-NYC_Empire_State_Building.jpg',
-        address: '20 W 34th St, New York, NY 10001',
-        coordinates: {
-            lat: 40.7484405,
-            lng: -73.9878584
-        },
-        creatorId: "u2"
-    }
-];
-
 const getplacesById = async (req, res, next) => {
     const id = req.params.id;
     //const place = DUMMY_PLACES.find(place => place.id === id);
@@ -60,7 +33,7 @@ const getPlacesbyUserId = async (req, res, next) => {
     let userPlaces;
     try {
         await client.connect();
-        const db = client.db('places');
+        const db = client.db('mern');
         userPlaces = await db.collection('places').find().toArray();
         userPlaces = userPlaces.filter(place => place.creatorId.toString() === id.toString());
         // console.log(userPlaces, id);

@@ -16,10 +16,10 @@ const Button = props => {
     );
   }
   if (props.to) {
+    // console.log('LINK', props.disabled);
     return (
       <Link
-        to={props.to}
-        exact={props.exact}
+        to={props.to.toString()}
         className={`button button--${props.size || 'default'} ${props.inverse &&
           'button--inverse'} ${props.danger && 'button--danger'}`}
       >
@@ -27,6 +27,7 @@ const Button = props => {
       </Link>
     );
   }
+  // console.log('Default', props.disabled);
   return (
     <button
       className={`button button--${props.size || 'default'} ${props.inverse &&

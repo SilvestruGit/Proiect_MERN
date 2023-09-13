@@ -12,7 +12,7 @@ router.post(
     [
         check('username').not().isEmpty(),
         check('email').normalizeEmail().isEmail(),
-        check('password').isLength({ min: 6 })
+        check('password').isLength({ min: 4 })
     ],
     userControllers.signup);
 router.post('/login', userControllers.login);
