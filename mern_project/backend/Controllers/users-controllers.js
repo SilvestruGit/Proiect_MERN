@@ -13,9 +13,13 @@ const getAllUsers = async (req, res, next) => {
 };
 
 const signup = async (req, res, next) => {
+  console.log('pre');
   const validatipnErrors = validationResult(req);
+  console.log('after');
+  console.log(validatipnErrors);
 
   if (!validatipnErrors.isEmpty()) {
+    console.log('inputs!!!!');
     return next(new Http_Error("Inputs not valid!", 422));
   }
 
@@ -25,11 +29,13 @@ const signup = async (req, res, next) => {
   try {
     existingUser = await User.findOne({ email: email });
   } catch (error) {
+    console.log('server!!!!');
     const err = new Http_Error("Signup failed, try again!", 500);
     return next(err);
   }
 
   if (existingUser) {
+    console.log('existing!!!!');
     const err = new Http_Error("User with this email exists already.", 422);
     return next(err);
   }
@@ -45,8 +51,10 @@ const signup = async (req, res, next) => {
   });
 
   try {
+    console.log('saving1!!!!');
     await newUser.save();
   } catch (error) {
+    console.log('saving2!!!!');
     const err = new Http_Error("Signing up failed!", 500);
     return next(err);
   }
@@ -58,18 +66,18 @@ const signup = async (req, res, next) => {
 const login = async (req, res, next) => {
   const { email, password } = req.body;
 
-  let loginUser;
+  let loggedinUser;
   try {
-    loginUser = await User.findOne({ email: email });
+    loggedinUser = await User.findOne({ email: email });
   } catch (error) {
     return next(error);
   }
 
-  if (!loginUser) {
+  if (!loggedinUser) {
     return next(new Http_Error("Email does not exist in the database!", 401));
   }
-  if (loginUser.password === password) {
-    return res.json({ message: "Logged in!" });
+  if (loggedinUser.password === password) {
+    return res.json({ message: "Logged in!", loggedinUser });
   }
   return next(new Http_Error("Invalid password!", 401));
 };

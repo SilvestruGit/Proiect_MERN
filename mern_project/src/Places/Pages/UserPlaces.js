@@ -1,37 +1,45 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import PlaceList from '../Components/PlacesList';
-
-const DUMMY_PLACES = [
-  {
-    id: 'p1',
-    title: 'Empire State Building',
-    description: 'One of the most famous sky scrapers in the world!',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/NYC_Empire_State_Building.jpg/640px-NYC_Empire_State_Building.jpg',
-    address: '20 W 34th St, New York, NY 10001',
-    coordinates: {
-      lat: 40.7484405,
-      lng: -73.9878584
-    },
-    creatorId: 1
-  },
-  {
-    id: 'p2',
-    title: 'Empire State Building',
-    description: 'One of the most famous sky scrapers in the world!',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/NYC_Empire_State_Building.jpg/640px-NYC_Empire_State_Building.jpg',
-    address: '20 W 34th St, New York, NY 10001',
-    coordinates: {
-      lat: 40.7484405,
-      lng: -73.9878584
-    },
-    creatorId: 2
-  }
-];
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import PlaceList from "../Components/PlacesList";
+import ErrorModal from "../../Shared/Components/UIElements/ErrorModal";
+import LoadingSpinner from "../../Shared/Components/UIElements/LoadingSpinner";
+import useHttpClient from "../../Shared/Components/Hooks/http-hook";
 
 const UserPlaces = () => {
-  const userId = useParams().userId;
-  return <PlaceList items={DUMMY_PLACES.filter(place => place.creatorId === Number(userId))} />;
+  const [data, setData] = useState(null);
+  const id = useParams().userId;
+
+  const { sendRequest, isLoading, errorState, errorHandler } = useHttpClient();
+
+  useEffect(() => {
+    const getUserPlaces = async () => {
+      try {
+        const responseData = await sendRequest(
+          `http://localhost:5000/api/places/user/${id}`
+        );
+        setData(responseData);
+      } catch (error) {
+        // console.log(error);
+      }
+    };
+    getUserPlaces();
+  }, [id, sendRequest]);
+
+  const refreshPlaces = (deletedPlaceId) => {
+    setData((prevData) =>
+      prevData.filter((place) => place._id !== deletedPlaceId)
+    );
+  };
+
+  return (
+    <React.Fragment>
+      {errorState && <ErrorModal error={errorState} onClear={errorHandler} />}
+      {isLoading && <LoadingSpinner asOverlay={true} />}
+      {!isLoading && data !== undefined && (
+        <PlaceList items={data} onDelete={refreshPlaces} />
+      )}
+    </React.Fragment>
+  );
 };
 
 export default UserPlaces;
